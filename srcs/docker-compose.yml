@@ -10,13 +10,13 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: "/home/${USER}/data/mariadb"
+      device: "/Users/${USER}/data/mariadb"
   wordpress:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "/home/${USER}/data/wordpress"
+      device: "/Users/${USER}/data/wordpress"
 
 # watch that you create a new directory on the device, otherwise permissions will be wrong.
 
