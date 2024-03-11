@@ -1,0 +1,66 @@
+version: "3.9"
+
+networks:
+  my_network:
+    driver: "bridge"
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "/home/${USER}/data/mariadb"
+  wordpress:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "/home/${USER}/data/wordpress"
+
+# watch that you create a new directory on the device, otherwise permissions will be wrong.
+
+services:
+  mariadb:
+    container_name: "mariadb"
+    build:
+      context: ./mariadb
+    volumes:
+      - "db:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    restart: "unless-stopped"
+    networks:
+      - my_network
+
+  wordpress:
+    container_name: "wordpress"
+    build:
+      context: ./wordpress
+    volumes:
+      - "wordpress:/var/www/html"
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    restart: "unless-stopped"
+    networks:
+      - my_network
+    depends_on:
+      - mariadb
+
+  nginx:
+    container_name: "nginx"
+    build:
+      context: ./nginx
+    volumes:
+      - "wordpress:/var/www/html"
+    ports:
+      - "443:443"
+    restart: "unless-stopped"
+    networks:
+      - my_network
+    depends_on:
+      - wordpress
